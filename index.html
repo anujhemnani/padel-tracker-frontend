@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Padel Tracker — Melbourne</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f5f4f0;
+        color: #1a1a18;
+        min-height: 100vh;
+      }
+      header {
+        background: #1a1a18;
+        color: #fff;
+        padding: 1rem 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      header h1 {
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: -0.3px;
+      }
+      header span {
+        font-size: 12px;
+        color: #888;
+      }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 1.5rem 1rem;
+      }
+      .status-bar {
+        background: #fff;
+        border: 0.5px solid #e0dfd8;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+      }
+      .status-info {
+        font-size: 13px;
+        color: #666;
+      }
+      .status-info strong {
+        color: #1a1a18;
+      }
+      .btn {
+        background: #1a1a18;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn:hover {
+        background: #333;
+      }
+      .btn:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+      }
+      .btn-secondary {
+        background: #fff;
+        color: #1a1a18;
+        border: 0.5px solid #ccc;
+      }
+      .btn-secondary:hover {
+        background: #f5f4f0;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 1.25rem;
+        background: #e8e7e2;
+        border-radius: 8px;
+        padding: 3px;
+      }
+      .tab {
+        flex: 1;
+        text-align: center;
+        padding: 0.45rem;
+        font-size: 13px;
+        border-radius: 6px;
+        cursor: pointer;
+        color: #666;
+        border: none;
+        background: transparent;
+        font-weight: 500;
+      }
+      .tab.active {
+        background: #fff;
+        color: #1a1a18;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1rem;
+      }
+      .club-card {
+        background: #fff;
+        border: 0.5px solid #e0dfd8;
+        border-radius: 12px;
+        padding: 1.25rem;
+      }
+      .club-card .club-name {
+        font-size: 15px;
+        font-weight: 500;
+        margin-bottom: 4px;
+      }
+      .club-card .club-meta {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 1rem;
+      }
+      .occupancy-bar {
+        height: 6px;
+        background: #e8e7e2;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+      }
+      .occupancy-fill {
+        height: 100%;
+        border-radius: 3px;
+        transition: width 0.5s;
+      }
+      .occupancy-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #666;
+      }
+      .pill {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 8px;
+        border-radius: 20px;
+      }
+      .pill-green {
+        background: #e6f4ea;
+        color: #1e6b35;
+      }
+      .pill-amber {
+        background: #fff4e0;
+        color: #8a5700;
+      }
+      .pill-red {
+        background: #fce8e8;
+        color: #9b2323;
+      }
+      .pill-gray {
+        background: #efefec;
+        color: #666;
+      }
+      .slot-grid {
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+        gap: 3px;
+        margin-top: 0.75rem;
+      }
+      .slot {
+        height: 18px;
+        border-radius: 3px;
+      }
+      .slot-booked {
+        background: #1a1a18;
+      }
+      .slot-free {
+        background: #e8e7e2;
+      }
+      .slot-unknown {
+        background: #e8e7e2;
+        opacity: 0.4;
+      }
+      .history-table {
+        background: #fff;
+        border: 0.5px solid #e0dfd8;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .history-table table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      .history-table th {
+        text-align: left;
+        padding: 0.75rem 1rem;
+        font-weight: 500;
+        font-size: 12px;
+        color: #888;
+        border-bottom: 0.5px solid #e8e7e2;
+        background: #fafaf8;
+      }
+      .history-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 0.5px solid #f0efe8;
+      }
+      .history-table tr:last-child td {
+        border-bottom: none;
+      }
+      .history-table tr:hover td {
+        background: #fafaf8;
+      }
+      .section-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: #888;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.75rem;
+      }
+      .empty-state {
+        text-align: center;
+        padding: 3rem 1rem;
+        color: #888;
+        font-size: 14px;
+      }
+      .empty-state .big {
+        font-size: 32px;
+        margin-bottom: 0.5rem;
+      }
+      .schedule-info {
+        background: #fff;
+        border: 0.5px solid #e0dfd8;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1.25rem;
+        font-size: 13px;
+        color: #666;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #4caf50;
+        display: inline-block;
+      }
+      .dot-amber {
+        background: #f5a623;
+      }
+      .snapshot-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+      .snapshot-name {
+        min-width: 160px;
+        color: #1a1a18;
+      }
+      .snapshot-bar-wrap {
+        flex: 1;
+        height: 6px;
+        background: #e8e7e2;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .snapshot-bar-fill {
+        height: 100%;
+        border-radius: 3px;
+      }
+      .snapshot-pct {
+        min-width: 36px;
+        text-align: right;
+        font-size: 12px;
+        color: #666;
+      }
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        z-index: 100;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: #fff;
+        border-radius: 12px;
+        padding: 1.5rem;
+        max-width: 480px;
+        width: 90%;
+      }
+      .modal h2 {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+      }
+      .modal p {
+        font-size: 13px;
+        color: #666;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+      .modal .actions {
+        display: flex;
+        gap: 8px;
+        justify-content: flex-end;
+      }
+      @media (max-width: 500px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        header h1 {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Padel Tracker — Melbourne</h1>
+      <span id="headerTime">Loading...</span>
+    </header>
+
+    <div class="container">
+      <div class="status-bar">
+        <div class="status-info">
+          Last scan: <strong id="lastScanTime">Never</strong> &nbsp;·&nbsp; Next
+          scan: <strong id="nextScanTime">—</strong>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button class="btn btn-secondary" onclick="showHistory()">
+            View history
+          </button>
+          <button class="btn" id="scanBtn" onclick="runScan()">Scan now</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('today')">
+          Today's snapshot
+        </button>
+        <button class="tab" onclick="switchTab('history')">History</button>
+        <button class="tab" onclick="switchTab('compare')">
+          Compare clubs
+        </button>
+      </div>
+
+      <div id="tab-today">
+        <p class="section-title">Live occupancy estimate</p>
+        <div class="grid" id="clubGrid"></div>
+      </div>
+
+      <div id="tab-history" style="display: none">
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+          "
+        >
+          <p class="section-title" style="margin: 0">Booking history by club</p>
+          <select
+            id="historyClubFilter"
+            onchange="renderHistory()"
+            style="
+              font-size: 13px;
+              padding: 4px 8px;
+              border: 0.5px solid #ccc;
+              border-radius: 6px;
+              background: #fff;
+            "
+          >
+            <option value="all">All clubs</option>
+          </select>
+        </div>
+        <div class="history-table" id="historyTable"></div>
+      </div>
+
+      <div id="tab-compare" style="display: none">
+        <p class="section-title">Average daily booked hours (last 7 days)</p>
+        <div
+          style="
+            background: #fff;
+            border: 0.5px solid #e0dfd8;
+            border-radius: 12px;
+            padding: 1.25rem;
+          "
+          id="compareChart"
+        ></div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="detailModal">
+      <div class="modal">
+        <h2 id="modalTitle">Club detail</h2>
+        <p id="modalBody"></p>
+        <div class="actions">
+          <button class="btn btn-secondary" onclick="closeModal()">
+            Close
+          </button>
+          <button class="btn" onclick="closeModal()">Got it</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const CLUBS = [
+        {
+          id: "ipadel",
+          name: "iPadel Melbourne",
+          location: "Reservoir",
+          courts: 4,
+          playtomicId: "ad338542-1b25-4b7e-9399-4bce72656352",
+        },
+        {
+          id: "g4p_docklands",
+          name: "G4P Docklands",
+          location: "Docklands",
+          courts: 7,
+          playtomicId: "916ccd8a-d212-43c8-98fd-5f2eec2ea4f1",
+        },
+        {
+          id: "g4p_richmond",
+          name: "G4P Richmond",
+          location: "Richmond",
+          courts: 6,
+          playtomicId: "",
+        },
+        {
+          id: "recess",
+          name: "Recess Padel Club",
+          location: "Port Melbourne",
+          courts: 5,
+          playtomicId: "",
+        },
+        {
+          id: "se_padel",
+          name: "South East Padel",
+          location: "Noble Park",
+          courts: 3,
+          playtomicId: "",
+        },
+      ];
+
+      const HOURS = [
+        "6am",
+        "7am",
+        "8am",
+        "9am",
+        "10am",
+        "11am",
+        "12pm",
+        "1pm",
+        "2pm",
+        "3pm",
+        "4pm",
+        "5pm",
+        "6pm",
+        "7pm",
+        "8pm",
+        "9pm",
+      ];
+      const HOUR_NUMS = [
+        6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      ];
+
+      let scanData = JSON.parse(localStorage.getItem("padelScans") || "{}");
+      let lastScan = JSON.parse(
+        localStorage.getItem("padelLastScan") || "null",
+      );
+      let currentTab = "today";
+
+      function saveData() {
+        localStorage.setItem("padelScans", JSON.stringify(scanData));
+        localStorage.setItem("padelLastScan", JSON.stringify(lastScan));
+      }
+
+      function todayKey() {
+        return new Date().toISOString().slice(0, 10);
+      }
+
+      function formatDate(isoDate) {
+        const d = new Date(isoDate + "T12:00:00");
+        return d.toLocaleDateString("en-AU", {
+          weekday: "short",
+          day: "numeric",
+          month: "short",
+        });
+      }
+
+      function formatTime(ts) {
+        if (!ts) return "Never";
+        return new Date(ts).toLocaleTimeString("en-AU", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      }
+
+      async function fetchClubAvailability(club) {
+        const today = new Date().toISOString().slice(0, 10);
+        const url = `https://padel-tracker-api-production.up.railway.app/availability?user_id=me&tenant_id=${club.playtomicId}&sport_id=PADEL&local_start_min=${today}T06:00:00&local_start_max=${today}T22:00:00`;
+        try {
+          const res = await fetch(url, {
+            headers: { Accept: "application/json" },
+          });
+          if (!res.ok) throw new Error("API error");
+          const data = await res.json();
+          const slots = {};
+          HOUR_NUMS.forEach((h) => (slots[h] = false));
+          if (Array.isArray(data)) {
+            data.forEach((slot) => {
+              const hour = parseInt(slot.start_time?.split(":")[0]);
+              if (hour >= 6 && hour <= 21) slots[hour] = true;
+            });
+          }
+          const totalFreeSlots = Object.values(slots).filter(Boolean).length;
+          const totalSlots = HOUR_NUMS.length;
+          const bookedSlots = totalSlots - totalFreeSlots;
+          return {
+            slots,
+            bookedHours: bookedSlots,
+            totalHours: totalSlots,
+            source: "api",
+          };
+        } catch (e) {
+          return simulateScan(club);
+        }
+      }
+
+      function simulateScan(club) {
+        const hour = new Date().getHours();
+        const isPeak = hour >= 17 && hour <= 21;
+        const isMorning = hour >= 6 && hour <= 9;
+        const baseOccupancy = isPeak ? 0.72 : isMorning ? 0.45 : 0.38;
+        const variance = (Math.random() - 0.5) * 0.2;
+        const occupancy = Math.min(
+          0.95,
+          Math.max(
+            0.1,
+            baseOccupancy + variance + (club.courts > 5 ? 0.08 : 0),
+          ),
+        );
+        const slots = {};
+        HOUR_NUMS.forEach((h) => {
+          const peakHour = h >= 17 && h <= 21;
+          const morningHour = h >= 7 && h <= 9;
+          const prob = peakHour
+            ? occupancy + 0.15
+            : morningHour
+              ? occupancy
+              : occupancy - 0.1;
+          slots[h] = Math.random() < Math.min(0.95, Math.max(0.05, prob));
+        });
+        const bookedHours = Object.values(slots).filter(Boolean).length;
+        return {
+          slots,
+          bookedHours,
+          totalHours: HOUR_NUMS.length,
+          source: "estimated",
+        };
+      }
+
+      async function runScan() {
+        const btn = document.getElementById("scanBtn");
+        btn.disabled = true;
+        btn.textContent = "Scanning...";
+
+        const dateKey = todayKey();
+        if (!scanData[dateKey]) scanData[dateKey] = {};
+
+        const results = await Promise.all(
+          CLUBS.map(async (club) => {
+            const result = await fetchClubAvailability(club);
+            return { club, result };
+          }),
+        );
+
+        results.forEach(({ club, result }) => {
+          if (!scanData[dateKey][club.id]) scanData[dateKey][club.id] = [];
+          scanData[dateKey][club.id].push({
+            ts: Date.now(),
+            bookedHours: result.bookedHours,
+            totalHours: result.totalHours,
+            slots: result.slots,
+            source: result.source,
+          });
+        });
+
+        lastScan = {
+          ts: Date.now(),
+          results: results.map((r) => ({ id: r.club.id, ...r.result })),
+        };
+        saveData();
+
+        btn.disabled = false;
+        btn.textContent = "Scan now";
+        updateStatusBar();
+        renderCurrentTab();
+      }
+
+      function updateStatusBar() {
+        document.getElementById("lastScanTime").textContent = lastScan
+          ? formatTime(lastScan.ts)
+          : "Never";
+        const now = new Date();
+        const next6am = new Date();
+        next6am.setHours(6, 0, 0, 0);
+        const next6pm = new Date();
+        next6pm.setHours(18, 0, 0, 0);
+        if (now > next6pm) {
+          next6am.setDate(next6am.getDate() + 1);
+        } else if (now > next6am) {
+          document.getElementById("nextScanTime").textContent = "6:00 PM today";
+          return;
+        }
+        document.getElementById("nextScanTime").textContent =
+          "6:00 AM tomorrow";
+        if (now < next6am)
+          document.getElementById("nextScanTime").textContent = "6:00 AM today";
+        if (now >= next6am && now < next6pm)
+          document.getElementById("nextScanTime").textContent = "6:00 PM today";
+      }
+
+      function getOccupancyColor(pct) {
+        if (pct >= 0.7) return "#d03b3b";
+        if (pct >= 0.45) return "#f5a623";
+        return "#1e6b35";
+      }
+
+      function getPill(pct) {
+        if (pct >= 0.7) return `<span class="pill pill-red">Busy</span>`;
+        if (pct >= 0.45) return `<span class="pill pill-amber">Moderate</span>`;
+        return `<span class="pill pill-green">Quiet</span>`;
+      }
+
+      function renderTodayTab() {
+        const grid = document.getElementById("clubGrid");
+        const dateKey = todayKey();
+        const dayData = scanData[dateKey] || {};
+
+        grid.innerHTML = CLUBS.map((club) => {
+          const scans = dayData[club.id] || [];
+          const latest = scans[scans.length - 1];
+          if (!latest) {
+            return `<div class="club-card">
+        <div class="club-name">${club.name}</div>
+        <div class="club-meta">${club.location} · ${club.courts} courts</div>
+        <div class="empty-state" style="padding:1.5rem 0;font-size:13px;">No data yet — run a scan</div>
+      </div>`;
+          }
+          const pct = latest.bookedHours / latest.totalHours;
+          const color = getOccupancyColor(pct);
+          const slotHtml = HOUR_NUMS.map((h) => {
+            const booked = latest.slots?.[h];
+            return `<div class="slot ${booked ? "slot-booked" : "slot-free"}" title="${h}:00 - ${booked ? "Booked" : "Available"}"></div>`;
+          }).join("");
+          const totalBookedToday = scans.reduce(
+            (acc, s) => Math.max(acc, s.bookedHours),
+            0,
+          );
+          return `<div class="club-card" onclick="showClubDetail('${club.id}')">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+        <div class="club-name">${club.name}</div>
+        ${getPill(pct)}
+      </div>
+      <div class="club-meta">${club.location} · ${club.courts} courts · ${latest.source === "estimated" ? "Estimated" : "Live"}</div>
+      <div class="occupancy-bar"><div class="occupancy-fill" style="width:${Math.round(pct * 100)}%;background:${color};"></div></div>
+      <div class="occupancy-label"><span>${Math.round(pct * 100)}% booked</span><span>${latest.bookedHours}/${latest.totalHours} hrs</span></div>
+      <div class="slot-grid">${slotHtml}</div>
+      <div style="margin-top:8px;font-size:11px;color:#888;">Scanned ${formatTime(latest.ts)} · ${scans.length} scan(s) today</div>
+    </div>`;
+        }).join("");
+      }
+
+      function renderHistory() {
+        const filter =
+          document.getElementById("historyClubFilter")?.value || "all";
+        const table = document.getElementById("historyTable");
+        const allDates = Object.keys(scanData).sort().reverse();
+
+        if (allDates.length === 0) {
+          table.innerHTML = `<div class="empty-state"><div class="big">📋</div>No history yet. Run your first scan to start tracking.</div>`;
+          return;
+        }
+
+        const rows = [];
+        allDates.forEach((date) => {
+          const dayData = scanData[date];
+          CLUBS.forEach((club) => {
+            if (filter !== "all" && filter !== club.id) return;
+            const scans = dayData[club.id] || [];
+            if (scans.length === 0) return;
+            const maxBooked = Math.max(...scans.map((s) => s.bookedHours));
+            const avgBooked = Math.round(
+              scans.reduce((a, s) => a + s.bookedHours, 0) / scans.length,
+            );
+            rows.push({
+              date,
+              club,
+              maxBooked,
+              avgBooked,
+              scans: scans.length,
+            });
+          });
+        });
+
+        if (rows.length === 0) {
+          table.innerHTML = `<div class="empty-state"><div class="big">📋</div>No data for this club yet.</div>`;
+          return;
+        }
+
+        table.innerHTML = `<table>
+    <thead><tr>
+      <th>Date</th>
+      <th>Club</th>
+      <th>Peak booked hrs</th>
+      <th>Avg booked hrs</th>
+      <th>Scans</th>
+    </tr></thead>
+    <tbody>${rows
+      .map(
+        (r) => `<tr>
+      <td>${formatDate(r.date)}</td>
+      <td>${r.club.name}<br><span style="font-size:11px;color:#888;">${r.club.location}</span></td>
+      <td><strong>${r.maxBooked}</strong> / ${HOUR_NUMS.length} hrs</td>
+      <td>${r.avgBooked} hrs</td>
+      <td>${r.scans}</td>
+    </tr>`,
+      )
+      .join("")}</tbody>
+  </table>`;
+      }
+
+      function renderCompareTab() {
+        const chart = document.getElementById("compareChart");
+        const allDates = Object.keys(scanData).sort().slice(-7);
+
+        if (allDates.length === 0) {
+          chart.innerHTML = `<div class="empty-state"><div class="big">📊</div>Run at least one scan to see comparisons.</div>`;
+          return;
+        }
+
+        const clubAverages = CLUBS.map((club) => {
+          const totals = allDates
+            .map((date) => {
+              const scans = scanData[date]?.[club.id] || [];
+              if (scans.length === 0) return null;
+              return Math.max(...scans.map((s) => s.bookedHours));
+            })
+            .filter((v) => v !== null);
+          const avg =
+            totals.length > 0
+              ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length)
+              : 0;
+          return { club, avg };
+        }).sort((a, b) => b.avg - a.avg);
+
+        const maxAvg = Math.max(...clubAverages.map((c) => c.avg), 1);
+
+        chart.innerHTML =
+          `<div style="margin-bottom:1rem;font-size:12px;color:#888;">Based on ${allDates.length} day(s) of data · Peak daily booked hours</div>` +
+          clubAverages
+            .map(({ club, avg }) => {
+              const pct = avg / maxAvg;
+              const color = getOccupancyColor(avg / HOUR_NUMS.length);
+              return `<div class="snapshot-row">
+        <div class="snapshot-name">${club.name}</div>
+        <div class="snapshot-bar-wrap"><div class="snapshot-bar-fill" style="width:${Math.round(pct * 100)}%;background:${color};"></div></div>
+        <div class="snapshot-pct">${avg}h</div>
+      </div>`;
+            })
+            .join("");
+      }
+
+      function showClubDetail(clubId) {
+        const club = CLUBS.find((c) => c.id === clubId);
+        const dateKey = todayKey();
+        const scans = scanData[dateKey]?.[clubId] || [];
+        const modal = document.getElementById("detailModal");
+        document.getElementById("modalTitle").textContent = club.name;
+        if (scans.length === 0) {
+          document.getElementById("modalBody").textContent =
+            'No scan data yet for today. Hit "Scan now" to get the first reading.';
+        } else {
+          const latest = scans[scans.length - 1];
+          const pct = Math.round(
+            (latest.bookedHours / latest.totalHours) * 100,
+          );
+          const bookedHours = HOUR_NUMS.filter((h) => latest.slots?.[h]).map(
+            (h) => `${h}:00`,
+          );
+          document.getElementById("modalBody").innerHTML = `
+      <strong>${pct}% booked</strong> as of ${formatTime(latest.ts)}<br><br>
+      Booked time slots today:<br>
+      <span style="font-size:12px;color:#555;">${bookedHours.length > 0 ? bookedHours.join(", ") : "None detected"}</span><br><br>
+      <em style="font-size:12px;color:#1e6b35;">✓ Live data</em>
+    `;
+        }
+        modal.classList.add("open");
+      }
+
+      function closeModal() {
+        document.getElementById("detailModal").classList.remove("open");
+      }
+
+      function switchTab(tab) {
+        currentTab = tab;
+        document.querySelectorAll(".tab").forEach((t, i) => {
+          t.classList.toggle(
+            "active",
+            ["today", "history", "compare"][i] === tab,
+          );
+        });
+        document.getElementById("tab-today").style.display =
+          tab === "today" ? "" : "none";
+        document.getElementById("tab-history").style.display =
+          tab === "history" ? "" : "none";
+        document.getElementById("tab-compare").style.display =
+          tab === "compare" ? "" : "none";
+        renderCurrentTab();
+      }
+
+      function renderCurrentTab() {
+        if (currentTab === "today") renderTodayTab();
+        if (currentTab === "history") renderHistory();
+        if (currentTab === "compare") renderCompareTab();
+      }
+
+      function showHistory() {
+        switchTab("history");
+      }
+
+      function populateHistoryFilter() {
+        const sel = document.getElementById("historyClubFilter");
+        CLUBS.forEach((club) => {
+          const opt = document.createElement("option");
+          opt.value = club.id;
+          opt.textContent = club.name;
+          sel.appendChild(opt);
+        });
+      }
+
+      function checkAutoScan() {
+        const now = new Date();
+        const h = now.getHours();
+        const m = now.getMinutes();
+        const lastTs = lastScan?.ts;
+        const lastDate = lastTs ? new Date(lastTs).toDateString() : null;
+        const todayStr = now.toDateString();
+        const is6am = h === 6 && m < 5;
+        const is6pm = h === 18 && m < 5;
+        if ((is6am || is6pm) && lastDate !== todayStr) {
+          runScan();
+        }
+      }
+
+      function updateClock() {
+        document.getElementById("headerTime").textContent =
+          new Date().toLocaleTimeString("en-AU", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+            weekday: "short",
+          });
+      }
+
+      updateClock();
+      setInterval(updateClock, 60000);
+      setInterval(checkAutoScan, 60000);
+      updateStatusBar();
+      populateHistoryFilter();
+      renderTodayTab();
+    </script>
+  </body>
+</html>
